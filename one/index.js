@@ -57,10 +57,10 @@ gl.bufferData(
     gl.ARRAY_BUFFER,
     // prettier-ignore
     new Float32Array([
-        -1, -1,
-        -1,  1,
-         1,  1,
          1, -1,
+         1,  1,
+        -1,  1,
+        -1, -1,
     ]),
     gl.STATIC_DRAW,
 );
@@ -70,6 +70,7 @@ gl.enableVertexAttribArray(positionAttribute);
 gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 gl.clearColor(0, 0, 0, 1);
+gl.enable(gl.CULL_FACE);
 
 const animate = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
