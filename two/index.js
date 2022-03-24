@@ -1,4 +1,8 @@
-import { vec2, vec3, mat4 } from 'https://cdn.skypack.dev/gl-matrix';
+import {
+    vec2,
+    vec3,
+    mat4,
+} from 'https://cdn.skypack.dev/pin/gl-matrix@v3.4.3-OSmwlRYK5GW1unkuAQkN/mode=imports,min/optimized/gl-matrix.js';
 
 /*
     Setup
