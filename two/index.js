@@ -56,7 +56,7 @@ gl.useProgram(program);
 */
 
 const controls = {
-    rotation: vec2.create(),
+    rotation: vec2.fromValues(-Math.PI / 8, 0),
 
     movement: {
         forward: false,
@@ -71,76 +71,88 @@ const controls = {
     },
 };
 
+const controlsActive = () => document.pointerLockElement === document.body;
+
 document.addEventListener('click', () => {
-    if (document.pointerLockElement !== document.body) {
+    if (!controlsActive()) {
         document.body.requestPointerLock();
     }
 });
 
 document.addEventListener('mousemove', (event) => {
-    if (document.pointerLockElement === document.body) {
+    if (controlsActive()) {
         controls.rotation[1] += -event.movementX * 0.0025;
         controls.rotation[0] += -event.movementY * 0.0025;
+        if (controls.rotation[0] < -Math.PI / 2) {
+            controls.rotation[0] = -Math.PI / 2;
+        }
+        if (controls.rotation[0] > Math.PI / 2) {
+            controls.rotation[0] = Math.PI / 2;
+        }
     }
 });
 
 document.addEventListener('keydown', (event) => {
-    const pressedKey = event.key.toLowerCase();
+    if (controlsActive()) {
+        const pressedKey = event.key.toLowerCase();
 
-    switch (pressedKey) {
-        case 'w':
-            controls.movement.forward = true;
-            break;
-        case 's':
-            controls.movement.backward = true;
-            break;
-        case 'a':
-            controls.movement.left = true;
-            break;
-        case 'd':
-            controls.movement.right = true;
-            break;
+        switch (pressedKey) {
+            case 'w':
+                controls.movement.forward = true;
+                break;
+            case 's':
+                controls.movement.backward = true;
+                break;
+            case 'a':
+                controls.movement.left = true;
+                break;
+            case 'd':
+                controls.movement.right = true;
+                break;
 
-        case 'shift':
-            controls.movement.down = true;
-            break;
-        case ' ':
-            controls.movement.up = true;
-            break;
+            case 'shift':
+                controls.movement.down = true;
+                break;
+            case ' ':
+                controls.movement.up = true;
+                break;
 
-        case 'e':
-            controls.movement.fast = true;
-            break;
+            case 'e':
+                controls.movement.fast = true;
+                break;
+        }
     }
 });
 
 document.addEventListener('keyup', (event) => {
-    const releasedKey = event.key.toLowerCase();
+    if (controlsActive()) {
+        const releasedKey = event.key.toLowerCase();
 
-    switch (releasedKey) {
-        case 'w':
-            controls.movement.forward = false;
-            break;
-        case 's':
-            controls.movement.backward = false;
-            break;
-        case 'a':
-            controls.movement.left = false;
-            break;
-        case 'd':
-            controls.movement.right = false;
-            break;
+        switch (releasedKey) {
+            case 'w':
+                controls.movement.forward = false;
+                break;
+            case 's':
+                controls.movement.backward = false;
+                break;
+            case 'a':
+                controls.movement.left = false;
+                break;
+            case 'd':
+                controls.movement.right = false;
+                break;
 
-        case 'shift':
-            controls.movement.down = false;
-            break;
-        case ' ':
-            controls.movement.up = false;
-            break;
+            case 'shift':
+                controls.movement.down = false;
+                break;
+            case ' ':
+                controls.movement.up = false;
+                break;
 
-        case 'e':
-            controls.movement.fast = false;
-            break;
+            case 'e':
+                controls.movement.fast = false;
+                break;
+        }
     }
 });
 
@@ -148,7 +160,7 @@ document.addEventListener('keyup', (event) => {
     Movement
 */
 
-const position = vec3.fromValues(0, 0, 2);
+const position = vec3.fromValues(0, 2, 3.5);
 
 const positionDelta = vec3.create();
 const origin = vec3.create();
@@ -223,49 +235,62 @@ const updateMatrixUniform = () => {
 const vao = gl.createVertexArray();
 gl.bindVertexArray(vao);
 
+// prettier-ignore
+const indices = new Uint8Array([
+    0, 1, 2,
+    0, 2, 3,
+
+    4, 5, 6,
+    4, 6, 7,
+
+    8, 9, 10,
+]);
+
 const indexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    // prettier-ignore
-    new Uint8Array([
-        0, 1, 2,
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
-        3, 4, 5,
-        3, 5, 6,
-    ]),
-    gl.STATIC_DRAW,
-);
+// prettier-ignore
+const vertices = new Float32Array([
+    1.5, 0, 1.5,
+    0.86, 0.08, 0.24,
+
+    1.5, 0, -1.5,
+    0.86, 0.08, 0.24,
+
+    -1.5, 0, -1.5,
+    0.86, 0.08, 0.24,
+
+    -1.5, 0, 1.5,
+    0.86, 0.08, 0.24,
+
+
+    0.5, 0, -0.5,
+    0.1, 0.1, 0.44,
+
+    0.5, 1, -0.5,
+    0.54, 0.17, 0.89,
+
+    -0.5, 1, -0.5,
+    0.54, 0.17, 0.89,
+
+    -0.5, 0, -0.5,
+    0.1, 0.1, 0.44,
+
+
+    0.5, 0, 0.5,
+    0, 1, 0,
+
+    0, 1, 0.5,
+    1, 1, 0,
+
+    -0.5, 0, 0.5,
+    0, 1, 0,
+]);
 
 const vertexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-gl.bufferData(
-    gl.ARRAY_BUFFER,
-    // prettier-ignore
-    new Float32Array([
-         0.5, -0.5,  0,
-         0,    1,    0,
-
-         0,    0.5,  0,
-         1,    1,    0,
-
-        -0.5, -0.5,  0,
-         0,    1,    0,
-
-         0.5, -0.5, -1,
-         0,    0,    1,
-
-         0.5,  0.5, -1,
-         1,    0,    0,
-
-        -0.5,  0.5, -1,
-         1,    0,    0,
-
-        -0.5, -0.5, -1,
-         0,    0,    1,
-    ]),
-    gl.STATIC_DRAW,
-);
+gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
 const positionAttribute = gl.getAttribLocation(program, 'a_position');
 gl.enableVertexAttribArray(positionAttribute);
@@ -279,8 +304,9 @@ gl.vertexAttribPointer(colorAttribute, 3, gl.FLOAT, false, 24, 12);
     Last WebGL preparations...
 */
 
-gl.clearColor(0, 0, 0, 1);
-gl.enable(gl.CULL_FACE);
+gl.clearColor(0.5, 1, 0.83, 1);
+// gl.enable(gl.CULL_FACE);
+// works, but looks bad.
 gl.enable(gl.DEPTH_TEST);
 
 /*
@@ -297,7 +323,7 @@ const animate = () => {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     updateMatrixUniform();
-    gl.drawElements(gl.TRIANGLES, 9, gl.UNSIGNED_BYTE, 0);
+    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_BYTE, 0);
 
     timeLast = timeNow;
     requestAnimationFrame(animate);

@@ -70,7 +70,8 @@ gl.enableVertexAttribArray(positionAttribute);
 gl.vertexAttribPointer(positionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 gl.clearColor(0, 0, 0, 1);
-gl.enable(gl.CULL_FACE);
+// gl.enable(gl.CULL_FACE);
+// works, but is useless.
 
 const animate = () => {
     gl.clear(gl.COLOR_BUFFER_BIT);
