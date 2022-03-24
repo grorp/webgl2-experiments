@@ -82,6 +82,7 @@ document.addEventListener('click', () => {
 document.addEventListener('mousemove', (event) => {
     if (controlsActive()) {
         controls.rotation[1] += -event.movementX * 0.0025;
+
         controls.rotation[0] += -event.movementY * 0.0025;
         if (controls.rotation[0] < -Math.PI / 2) {
             controls.rotation[0] = -Math.PI / 2;
