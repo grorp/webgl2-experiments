@@ -11,6 +11,8 @@ import {
 const canvas = document.createElement('canvas');
 document.body.appendChild(canvas);
 
+const gl = canvas.getContext('webgl2');
+
 const resizeObserver = new ResizeObserver((entries) => {
     const entry = entries[0];
     canvas.width = entry.devicePixelContentBoxSize[0].inlineSize;
@@ -20,8 +22,6 @@ const resizeObserver = new ResizeObserver((entries) => {
 resizeObserver.observe(canvas, {
     box: 'device-pixel-content-box',
 });
-
-const gl = canvas.getContext('webgl2');
 
 /*
     Shaders
@@ -56,6 +56,7 @@ gl.useProgram(program);
 */
 
 const controls = {
+    position: vec3.fromValues(0, 2, 3.5),
     rotation: vec2.fromValues(-Math.PI / 8, 0),
 
     movement: {
@@ -157,12 +158,6 @@ document.addEventListener('keyup', (event) => {
     }
 });
 
-/*
-    Movement
-*/
-
-const position = vec3.fromValues(0, 2, 3.5);
-
 const positionDelta = vec3.create();
 const origin = vec3.create();
 
@@ -195,7 +190,7 @@ const move = (timeDelta) => {
         timeDelta * (controls.movement.fast ? 0.01 : 0.0015),
     );
 
-    vec3.add(position, position, positionDelta);
+    vec3.add(controls.position, controls.position, positionDelta);
     vec3.zero(positionDelta);
 };
 
@@ -211,7 +206,7 @@ const projectionMatrix = mat4.create();
 
 const updateMatrixUniform = () => {
     mat4.identity(viewMatrix);
-    mat4.translate(viewMatrix, viewMatrix, position);
+    mat4.translate(viewMatrix, viewMatrix, controls.position);
     mat4.rotateY(viewMatrix, viewMatrix, controls.rotation[1]);
     mat4.rotateX(viewMatrix, viewMatrix, controls.rotation[0]);
     mat4.invert(viewMatrix, viewMatrix);
